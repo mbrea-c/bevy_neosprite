@@ -1,0 +1,31 @@
+[package]
+name = "bevy_neosprite"
+version = "0.1.0"
+edition = "2021"
+readme = "README.md"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/mbrea-c/bevy_neosprite"
+description = "Asset-driven sprite system built on top of Mesh2d"
+keywords = ["bevy", "gamedev", "sprites", "graphics"]
+resolver = "2"
+
+[features]
+webgl = []
+webgpu = []
+
+[dependencies]
+# bevy
+bevy = { version = "0.14.2" }
+
+# other
+bytemuck = { version = "1.5", features = ["derive"] }
+fixedbitset = "0.5"
+guillotiere = "0.6.0"
+thiserror = "1.0"
+rectangle-pack = "0.4"
+bitflags = "2.3"
+radsort = "0.1"
+
+[package.metadata.docs.rs]
+rustdoc-args = ["-Zunstable-options", "--cfg", "docsrs"]
+all-features = true
