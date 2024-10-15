@@ -11,6 +11,7 @@ struct Mesh2d {
     // Use bevy_render::maths::mat2x4_f32_to_mat3x3_unpack to unpack
     local_from_world_transpose_a: mat2x4<f32>,
     local_from_world_transpose_b: f32,
+    uv_range: array<vec2<f32>, 2u>,
     // 'flags' is a bit field indicating various options. u32 is 32 bits so we have up to 32 options.
     flags: u32,
 };

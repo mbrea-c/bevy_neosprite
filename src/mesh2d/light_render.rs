@@ -3,8 +3,7 @@ use bevy::{
     render::{
         render_resource::{DynamicUniformBuffer, ShaderType},
         renderer::{RenderDevice, RenderQueue},
-        texture::TextureCache,
-        view::{ExtractedView, RenderLayers},
+        view::ExtractedView,
         Extract,
     },
 };
@@ -61,7 +60,6 @@ pub fn extract_lights(
     mut previous_point_lights_len: Local<usize>,
 ) {
     let mut point_lights_values = Vec::with_capacity(*previous_point_lights_len);
-    println!("Extract system is running");
     for (entity, point_light, transform, view_visibility) in &point_lights {
         // if !view_visibility.get() {
         //     println!("Not visible, skipping...");
@@ -77,8 +75,6 @@ pub fn extract_lights(
             radius: point_light.radius,
             transform: *transform,
         };
-
-        println!("Extracted light: {:#?}", extracted_point_light);
 
         point_lights_values.push((entity, (extracted_point_light,)));
     }
@@ -120,6 +116,8 @@ pub fn prepare_lights(
     ))]
     let mut gpu_point_lights = [GpuPointLight::default(); MAX_POINT_LIGHTS];
     for (index, (_light_entity, light)) in point_lights.iter().enumerate().take(MAX_POINT_LIGHTS) {
+        println!("Extracted light at {:?}", light.transform.translation());
+
         gpu_point_lights[index] = GpuPointLight {
             color: light.color.to_vec4(),
             pos: light.transform.translation(),

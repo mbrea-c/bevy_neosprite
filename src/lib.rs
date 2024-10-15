@@ -9,6 +9,7 @@
 
 //! Provides 2D sprite rendering functionality.
 mod mesh2d;
+mod sprite2d;
 
 pub mod prelude {
     #[doc(hidden)]
@@ -19,6 +20,7 @@ use bevy::render::render_asset::prepare_assets;
 use bevy::render::texture::GpuImage;
 use bevy::render::{ExtractSchedule, Render, RenderApp, RenderSet};
 pub use mesh2d::*;
+pub use sprite2d::*;
 
 use bevy::app::prelude::*;
 use bevy::asset::{Assets, Handle};
@@ -58,6 +60,7 @@ impl Plugin for SpritePlugin {
                 (
                     calculate_bounds_2d.in_set(VisibilitySystems::CalculateBounds),
                     (check_visibility::<WithMesh2d>,).in_set(VisibilitySystems::CheckVisibility),
+                    update_sprite_2d_uv_ranges,
                 ),
             );
 

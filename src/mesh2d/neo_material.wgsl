@@ -1,6 +1,7 @@
 #import bevy_sprite::{
     mesh2d_vertex_output::VertexOutput,
     mesh2d_view_bindings::{view, lights},
+    mesh2d_functions as fns,
 }
 
 #ifdef TONEMAP_IN_SHADER
@@ -28,18 +29,12 @@ fn fragment(
 ) -> @location(0) vec4<f32> {
     var base_color = material.color;
     var rendered_color: vec3<f32> = vec3(0.,0.,0.);
+    let uv = fns::map_uv_range(mesh.uv, mesh.index);
 
-    // TODO: CURRNETLY DOES NOTHING. WANT TO CHANGE?
- //#ifdef VERTEX_COLORS
- //    output_color = output_color * mesh.color;
- //#endif
-
-    // First we get the location of the current fragment relative to camera
-    let camera_pos = vec3<f32>(0., 0., 0.);
-    let fragment_pos = mesh.world_position.xyz;
+    let world_pos = mesh.world_position.xyz;
 
     if ((material.flags & NEO_MATERIAL_FLAGS_TEXTURE_BIT) != 0u) {
-        base_color = textureSample(texture, texture_sampler, mesh.uv);
+        base_color = textureSample(texture, texture_sampler, uv);
     }
 
     if base_color.a < 0.1 {
@@ -49,22 +44,18 @@ fn fragment(
     rendered_color = rendered_color + base_color.rgb * AMBIENT;
 
     if ((material.flags & NEO_MATERIAL_FLAGS_NORMAL_BIT) != 0u) {
-        let normal_color = textureSample(normal_texture, normal_texture_sampler, mesh.uv);
+        let normal_color = textureSample(normal_texture, normal_texture_sampler, uv);
         let normal_vec = normalize(normal_color.xyz * 2. - 1.);
-
-        // let light_pos = vec3(0., 0., 2.5);
-        // let light_vec = normalize(light_pos - fragment_pos);
-        // let diffuse_intensity = max(dot(normal_vec, light_vec), 0.);
-
-        // rendered_color = rendered_color + diffuse_intensity * base_color.rgb * 5.;
+        let world_normal = fns::mesh2d_normal_local_to_world(normal_vec, mesh.index);
 
         for (var i = 0u; i < lights.n_point_lights; i++) {
             let light = lights.point_lights[i];
             let light_pos = light.pos;
-            let light_vec = normalize(light_pos - fragment_pos);
-            let diffuse_intensity = max(dot(normal_vec, light_vec), 0.);
+            let light_vec = normalize(light_pos - world_pos);
+            let diffuse_intensity = max(dot(world_normal, light_vec), 0.);
 
             rendered_color = rendered_color + diffuse_intensity * base_color.rgb * light.color.rgb;
+            // return vec4(diffuse_intensity, diffuse_intensity, diffuse_intensity, 1.);
         }
     }
     var output_color = vec4(rendered_color, base_color.a);

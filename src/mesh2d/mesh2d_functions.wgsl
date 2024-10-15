@@ -43,3 +43,11 @@ fn mesh2d_tangent_local_to_world(world_from_local: mat4x4<f32>, vertex_tangent: 
         vertex_tangent.w
     );
 }
+
+// Requires mesh bindings
+fn map_uv_range(uv: vec2<f32>, index: u32) -> vec2<f32> {
+    let start = mesh[index].uv_range[0];
+    let end = mesh[index].uv_range[1];
+
+    return mix(start, end, uv);
+}

@@ -30,6 +30,7 @@ struct Vertex {
 @vertex
 fn vertex(vertex: Vertex) -> VertexOutput {
     var out: VertexOutput;
+    out.index = vertex.instance_index;
 #ifdef VERTEX_UVS
     out.uv = vertex.uv;
 #endif

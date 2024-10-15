@@ -11,7 +11,7 @@ use bevy::ecs::{
     query::ROQueryItem,
     system::{lifetimeless::*, SystemParamItem, SystemState},
 };
-use bevy::math::{Affine3, Vec4};
+use bevy::math::{Affine3, EulerRot, Vec2, Vec4};
 use bevy::prelude::{Deref, DerefMut};
 use bevy::reflect::{std_traits::ReflectDefault, Reflect};
 use bevy::render::batching::no_gpu_preprocessing::{
@@ -48,6 +48,24 @@ use super::{GpuLights, LightMeta};
 #[derive(Default, Clone, Component, Debug, Reflect, PartialEq, Eq, Deref, DerefMut)]
 #[reflect(Default, Component)]
 pub struct Mesh2dHandle(pub Handle<Mesh>);
+
+/// Component for restricting rendering of a material to a subset of the UV coordinates.
+///
+/// Useful for rendering a sprite sheet or a texture atlas.
+#[derive(Clone, Component, Debug, Reflect, PartialEq)]
+pub struct Mesh2dUvRange {
+    pub start: Vec2,
+    pub end: Vec2,
+}
+
+impl Default for Mesh2dUvRange {
+    fn default() -> Self {
+        Self {
+            start: Vec2::ZERO,
+            end: Vec2::ONE,
+        }
+    }
+}
 
 impl From<Handle<Mesh>> for Mesh2dHandle {
     fn from(handle: Handle<Mesh>) -> Self {
@@ -159,6 +177,7 @@ impl Plugin for NeoMesh2dRenderPlugin {
 #[derive(Component)]
 pub struct Mesh2dTransforms {
     pub world_from_local: Affine3,
+    pub uv_range: [Vec2; 2],
     pub flags: u32,
 }
 
@@ -172,6 +191,7 @@ pub struct Mesh2dUniform {
     //   [2].z
     pub local_from_world_transpose_a: [Vec4; 2],
     pub local_from_world_transpose_b: f32,
+    pub uv_range: [Vec2; 2],
     pub flags: u32,
 }
 
@@ -179,11 +199,16 @@ impl From<&Mesh2dTransforms> for Mesh2dUniform {
     fn from(mesh_transforms: &Mesh2dTransforms) -> Self {
         let (local_from_world_transpose_a, local_from_world_transpose_b) =
             mesh_transforms.world_from_local.inverse_transpose_3x3();
+        println!(
+            "Matrix: {:?}",
+            mesh_transforms.world_from_local.to_transpose()
+        );
         Self {
             world_from_local: mesh_transforms.world_from_local.to_transpose(),
             local_from_world_transpose_a,
             local_from_world_transpose_b,
             flags: mesh_transforms.flags,
+            uv_range: mesh_transforms.uv_range,
         }
     }
 }
@@ -220,6 +245,7 @@ pub fn extract_mesh2d(
             &ViewVisibility,
             &GlobalTransform,
             &Mesh2dHandle,
+            Option<&Mesh2dUvRange>,
             Has<NoAutomaticBatching>,
         )>,
     >,
@@ -227,19 +253,33 @@ pub fn extract_mesh2d(
     render_mesh_instances.clear();
     let mut entities = Vec::with_capacity(*previous_len);
 
-    for (entity, view_visibility, transform, handle, no_automatic_batching) in &query {
+    for (entity, view_visibility, transform, handle, maybe_uv_range, no_automatic_batching) in
+        &query
+    {
         if !view_visibility.get() {
+            println!("No view visibility somehow (but do get other suff??))");
             continue;
         }
         // FIXME: Remove this - it is just a workaround to enable rendering to work as
         // render commands require an entity to exist at the moment.
         entities.push((entity, Mesh2d));
+
+        let uv_range = maybe_uv_range.cloned().unwrap_or_default();
+        println!(
+            "Global transform rotation {:?} for entity {:?}",
+            transform
+                .compute_transform()
+                .rotation
+                .to_euler(EulerRot::XYZ),
+            entity
+        );
         render_mesh_instances.insert(
             entity,
             RenderMesh2dInstance {
                 transforms: Mesh2dTransforms {
                     world_from_local: (&transform.affine()).into(),
                     flags: MeshFlags::empty().bits(),
+                    uv_range: [uv_range.start, uv_range.end],
                 },
                 mesh_asset_id: handle.0.id(),
                 material_bind_group_id: Material2dBindGroupId::default(),
@@ -712,7 +752,6 @@ impl<P: PhaseItem> RenderCommand<P> for DrawMesh2d {
         (meshes, render_mesh2d_instances): SystemParamItem<'w, '_, Self::Param>,
         pass: &mut TrackedRenderPass<'w>,
     ) -> RenderCommandResult {
-        println!("Got to rendering the draw mesh thingsi");
         let meshes = meshes.into_inner();
         let render_mesh2d_instances = render_mesh2d_instances.into_inner();
 
