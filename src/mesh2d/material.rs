@@ -51,13 +51,13 @@ use crate::{
 ///
 /// Here is a simple Material2d implementation. The [`AsBindGroup`] derive has many features. To see what else is available,
 /// check out the [`AsBindGroup`] documentation.
-/// ```
-/// # use bevy_sprite::{Material2d, MaterialMesh2dBundle};
-/// # use bevy_ecs::prelude::*;
-/// # use bevy_reflect::TypePath;
-/// # use bevy_render::{render_resource::{AsBindGroup, ShaderRef}, texture::Image};
-/// # use bevy_color::LinearRgba;
-/// # use bevy_asset::{Handle, AssetServer, Assets, Asset};
+/// ```ignore
+/// use bevy_sprite::{Material2d, MaterialMesh2dBundle};
+/// use bevy_ecs::prelude::*;
+/// use bevy_reflect::TypePath;
+/// use bevy_render::{render_resource::{AsBindGroup, ShaderRef}, texture::Image};
+/// use bevy_color::LinearRgba;
+/// use bevy_asset::{Handle, AssetServer, Assets, Asset};
 ///
 /// #[derive(AsBindGroup, Debug, Clone, Asset, TypePath)]
 /// pub struct CustomMaterial {
