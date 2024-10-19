@@ -81,9 +81,10 @@ impl Plugin for SpritePlugin {
 
 /// System calculating and inserting an [`Aabb`] component to entities with either:
 /// - a `Mesh2dHandle` component,
-/// and without a [`NoFrustumCulling`] component.
+///   and without a [`NoFrustumCulling`] component.
 ///
 /// Used in system set [`VisibilitySystems::CalculateBounds`].
+#[allow(clippy::type_complexity)]
 pub fn calculate_bounds_2d(
     mut commands: Commands,
     meshes: Res<Assets<Mesh>>,

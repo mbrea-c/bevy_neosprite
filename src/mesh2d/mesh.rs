@@ -231,6 +231,7 @@ pub struct RenderMesh2dInstances(EntityHashMap<RenderMesh2dInstance>);
 #[derive(Component)]
 pub struct Mesh2d;
 
+#[allow(clippy::type_complexity)]
 pub fn extract_mesh2d(
     mut commands: Commands,
     mut previous_len: Local<usize>,

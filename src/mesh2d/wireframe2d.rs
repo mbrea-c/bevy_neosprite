@@ -138,6 +138,7 @@ fn wireframe_color_changed(
 
 /// Applies or remove the wireframe material to any mesh with a [`Wireframe2d`] component, and removes it
 /// for any mesh with a [`NoWireframe2d`] component.
+#[allow(clippy::type_complexity)]
 fn apply_wireframe_material(
     mut commands: Commands,
     mut materials: ResMut<Assets<Wireframe2dMaterial>>,
