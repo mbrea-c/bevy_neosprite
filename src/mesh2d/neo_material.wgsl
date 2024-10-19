@@ -16,6 +16,7 @@ struct ColorMaterial {
 const NEO_MATERIAL_FLAGS_TEXTURE_BIT: u32 = 1u;
 const NEO_MATERIAL_FLAGS_NORMAL_BIT: u32 = 2u;
 const AMBIENT: f32 = 0.1;
+const BIAS: f32 = 1.;
 
 @group(2) @binding(0) var<uniform> material: ColorMaterial;
 @group(2) @binding(1) var texture: texture_2d<f32>;
@@ -51,11 +52,12 @@ fn fragment(
         for (var i = 0u; i < lights.n_point_lights; i++) {
             let light = lights.point_lights[i];
             let light_pos = light.pos;
-            let light_vec = normalize(light_pos - world_pos);
-            let diffuse_intensity = max(dot(world_normal, light_vec), 0.);
+            let light_vec = light_pos - world_pos;
+            let light_vec_normalized = normalize(light_vec);
+            let diffuse_intensity = max(dot(world_normal, light_vec_normalized), 0.);
+            let attenuation_factor = 1. / (BIAS + length(light_vec) * length(light_vec));
 
-            rendered_color = rendered_color + diffuse_intensity * base_color.rgb * light.color.rgb;
-            // return vec4(diffuse_intensity, diffuse_intensity, diffuse_intensity, 1.);
+            rendered_color = rendered_color + diffuse_intensity * base_color.rgb * light.color.rgb * attenuation_factor;
         }
     }
     var output_color = vec4(rendered_color, base_color.a);

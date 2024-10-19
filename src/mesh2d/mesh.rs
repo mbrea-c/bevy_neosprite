@@ -11,7 +11,7 @@ use bevy::ecs::{
     query::ROQueryItem,
     system::{lifetimeless::*, SystemParamItem, SystemState},
 };
-use bevy::math::{Affine3, EulerRot, Vec2, Vec4};
+use bevy::math::{Affine3, Vec2, Vec4};
 use bevy::prelude::{Deref, DerefMut};
 use bevy::reflect::{std_traits::ReflectDefault, Reflect};
 use bevy::render::batching::no_gpu_preprocessing::{
@@ -199,10 +199,6 @@ impl From<&Mesh2dTransforms> for Mesh2dUniform {
     fn from(mesh_transforms: &Mesh2dTransforms) -> Self {
         let (local_from_world_transpose_a, local_from_world_transpose_b) =
             mesh_transforms.world_from_local.inverse_transpose_3x3();
-        println!(
-            "Matrix: {:?}",
-            mesh_transforms.world_from_local.to_transpose()
-        );
         Self {
             world_from_local: mesh_transforms.world_from_local.to_transpose(),
             local_from_world_transpose_a,
@@ -257,7 +253,7 @@ pub fn extract_mesh2d(
         &query
     {
         if !view_visibility.get() {
-            println!("No view visibility somehow (but do get other suff??))");
+            // println!("No view visibility somehow (but do get other suff??))");
             continue;
         }
         // FIXME: Remove this - it is just a workaround to enable rendering to work as
@@ -265,14 +261,6 @@ pub fn extract_mesh2d(
         entities.push((entity, Mesh2d));
 
         let uv_range = maybe_uv_range.cloned().unwrap_or_default();
-        println!(
-            "Global transform rotation {:?} for entity {:?}",
-            transform
-                .compute_transform()
-                .rotation
-                .to_euler(EulerRot::XYZ),
-            entity
-        );
         render_mesh_instances.insert(
             entity,
             RenderMesh2dInstance {
