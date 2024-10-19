@@ -1,4 +1,4 @@
-use crate::{Material2d, Material2dPlugin, MaterialMesh2dBundle};
+use crate::{Material2d, Material2dPlugin, MaterialMesh2dBundle, NeoMaterialAssetLoader};
 use bevy::app::{App, Plugin};
 use bevy::asset::{load_internal_asset, Asset, AssetApp, Assets, Handle};
 use bevy::color::{Color, ColorToComponents, LinearRgba};
@@ -27,6 +27,8 @@ impl Plugin for NeoMaterialPlugin {
 
         app.add_plugins(Material2dPlugin::<NeoMaterial>::default())
             .register_asset_reflect::<NeoMaterial>();
+
+        app.init_asset_loader::<NeoMaterialAssetLoader>();
 
         app.world_mut()
             .resource_mut::<Assets<NeoMaterial>>()

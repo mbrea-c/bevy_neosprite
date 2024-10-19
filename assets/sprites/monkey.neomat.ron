@@ -1,0 +1,4 @@
+(
+    texture: Some("sprites/monkey/spritesheet_diffuse.png"),
+    normal: Some("sprites/monkey/spritesheet_normal.png"),
+)

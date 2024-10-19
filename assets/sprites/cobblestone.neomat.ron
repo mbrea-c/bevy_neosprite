@@ -1,0 +1,4 @@
+(
+    texture: Some("sprites/cobblestone/diffuse.png"),
+    normal: Some("sprites/cobblestone/normal.png"),
+)

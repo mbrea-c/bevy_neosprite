@@ -1,0 +1,12 @@
+(
+    material_path: "sprites/monkey.neomat.ron",
+    animations: [
+        UniformGrid(
+            region_start: (0., 0.),
+            region_end: (1., 1.),
+            sprites_horizontal: 10,
+            sprites_vertical: 3,
+            sprites_total: 23,
+        )
+    ], 
+)

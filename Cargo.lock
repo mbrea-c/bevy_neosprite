@@ -763,6 +763,8 @@ dependencies = [
  "guillotiere",
  "radsort",
  "rectangle-pack",
+ "ron",
+ "serde",
  "thiserror",
 ]
 

@@ -10,6 +10,7 @@
 //! Provides 2D sprite rendering functionality.
 mod mesh2d;
 mod sprite2d;
+mod utils;
 
 pub mod prelude {
     #[doc(hidden)]
@@ -21,9 +22,10 @@ use bevy::render::texture::GpuImage;
 use bevy::render::{ExtractSchedule, Render, RenderApp, RenderSet};
 pub use mesh2d::*;
 pub use sprite2d::*;
+pub use utils::error::*;
 
 use bevy::app::prelude::*;
-use bevy::asset::{Assets, Handle};
+use bevy::asset::{AssetApp, Assets, Handle};
 use bevy::ecs::prelude::*;
 use bevy::render::{
     mesh::Mesh,
@@ -53,6 +55,9 @@ pub type WithMesh2d = With<Mesh2dHandle>;
 
 impl Plugin for SpritePlugin {
     fn build(&self, app: &mut App) {
+        app.init_asset::<SpriteAtlas<NeoMaterial>>()
+            .init_asset_loader::<SpriteAtlasAssetLoader<NeoMaterial>>();
+
         app.register_type::<Mesh2dHandle>()
             .add_plugins((NeoMesh2dRenderPlugin, NeoMaterialPlugin))
             .add_systems(
@@ -60,7 +65,9 @@ impl Plugin for SpritePlugin {
                 (
                     calculate_bounds_2d.in_set(VisibilitySystems::CalculateBounds),
                     (check_visibility::<WithMesh2d>,).in_set(VisibilitySystems::CheckVisibility),
-                    update_sprite_2d_uv_ranges,
+                    //update_sprite_2d_uv_ranges,
+                    update_sprite_atlas_material::<NeoMaterial>,
+                    update_sprite_atlas_uv_ranges::<NeoMaterial>,
                 ),
             );
 

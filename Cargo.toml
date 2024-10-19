@@ -25,6 +25,8 @@ thiserror = "1.0"
 rectangle-pack = "0.4"
 bitflags = "2.3"
 radsort = "0.1"
+serde = { version = "1.0.210", features = ["derive"] }
+ron = "0.8.1"
 
 [package.metadata.docs.rs]
 rustdoc-args = ["-Zunstable-options", "--cfg", "docsrs"]
